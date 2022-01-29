@@ -1,10 +1,8 @@
-import unittest
-
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
 from django import forms
-from django.core.paginator import Page, Paginator
+from django.core.paginator import Page
 
 from ..models import Post, Group
 
@@ -36,19 +34,19 @@ class PagesTests(TestCase):
         """URL-адрес использует соответствующий шаблон."""
         # Собираем в словарь пары "имя_html_шаблона: reverse(name)"
         templates_pages_names = {
-            'posts/index.html': reverse('posts:index'),
-            'posts/group_list.html': (
-                reverse('posts:posts_group', kwargs={'slug': 'test-slug'})),
-            'posts/profile.html': (
-                reverse('posts:profile', kwargs={'username': 'HasNoName'})),
-            'posts/post_detail.html': (
-                reverse('posts:post_detail', kwargs={'post_id': PagesTests.post.pk})),
-            'posts/create_post.html': reverse('posts:post_create'),
-            'posts/create_post.html': (
-                reverse('posts:post_edit', kwargs={'post_id': PagesTests.post.pk})),
+            reverse('posts:index'): 'posts/index.html',
+            (reverse('posts:posts_group', kwargs={'slug': 'test-slug'})):
+                'posts/group_list.html',
+            (reverse('posts:profile', kwargs={'username': 'HasNoName'})):
+                'posts/profile.html',
+            (reverse('posts:post_detail', kwargs={'post_id': PagesTests.post.pk})):
+                'posts/post_detail.html',
+            reverse('posts:post_create'): 'posts/create_post.html',
+            (reverse('posts:post_edit', kwargs={'post_id': PagesTests.post.pk})):
+                'posts/create_post.html',
         }
         # Проверяем, что при обращении к name вызывается соответствующий HTML-шаблон
-        for template, reverse_name in templates_pages_names.items():
+        for reverse_name, template in templates_pages_names.items():
             with self.subTest(reverse_name=reverse_name):
                 response = self.authorized_client.get(reverse_name)
                 self.assertTemplateUsed(response, template)
@@ -73,7 +71,8 @@ class PagesTests(TestCase):
 
     def test_edit_show_correct_context(self):
         """Шаблон edit сформирован с правильным контекстом."""
-        response = self.authorized_client.get(reverse('posts:post_edit', kwargs={'post_id': PagesTests.post.pk}))
+        response = self.authorized_client.get(
+            reverse('posts:post_edit', kwargs={'post_id': PagesTests.post.pk}))
         # Словарь ожидаемых типов полей формы:
         # указываем, объектами какого класса должны быть поля формы
         form_fields = {
@@ -93,7 +92,8 @@ class PagesTests(TestCase):
     # в первом элементе списка object_list содержит ожидаемые значения
     def test_posts_group_show_correct_context(self):
         """Шаблон task_list сформирован с правильным контекстом."""
-        response = self.authorized_client.get(reverse('posts:posts_group', kwargs={'slug': 'test-slug'}))
+        response = self.authorized_client.get(
+            reverse('posts:posts_group', kwargs={'slug': 'test-slug'}))
         # Взяли первый элемент из списка и проверили, что его содержание
         # совпадает с ожидаемым
         objecta = response.context.get('group')
@@ -111,14 +111,16 @@ class PagesTests(TestCase):
     # содержит ожидаемые значения
     def test_post_detail_pages_show_correct_context(self):
         """Шаблон post_detail сформирован с правильным контекстом."""
-        response = (self.authorized_client.
-            get(reverse('posts:post_detail', kwargs={'post_id': PagesTests.post.pk})))
+        response = (self.authorized_client.get(
+            reverse('posts:post_detail',
+                    kwargs={'post_id': PagesTests.post.pk})))
         self.assertEqual(response.context.get('post').text, 'Тестовая группа')
 
     def test_profile(self):
         """Шаблон profile проверка контекста."""
-        response = (self.authorized_client.
-            get(reverse('posts:profile', kwargs={'username': 'HasNoName'})))
+        response = (self.authorized_client.get(
+            reverse('posts:profile',
+                    kwargs={'username': 'HasNoName'})))
         page_obj = response.context.get('page_obj')
         self.assertIsInstance(page_obj, Page)
         self.assertEqual(len(page_obj), 1)

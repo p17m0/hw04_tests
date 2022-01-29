@@ -39,7 +39,8 @@ class PostFormTest(TestCase):
             data=form_data,
             follow=True
         )
-        self.assertRedirects(response, reverse('posts:profile', kwargs={'username': 'HasNoName'}))
+        self.assertRedirects(response,
+                             reverse('posts:profile', kwargs={'username': 'HasNoName'}))
 
     def test_PostForm_edit(self):
         """Тестируем PostForm."""
@@ -48,9 +49,11 @@ class PostFormTest(TestCase):
         }
 
         response = self.authorized_client.post(
-            reverse('posts:post_edit', kwargs={'post_id': PostFormTest.post.pk}),
+            reverse('posts:post_edit',
+                    kwargs={'post_id': PostFormTest.post.pk}),
             data=form_data,
             follow=True
         )
-        self.assertRedirects(response, reverse('posts:post_detail', kwargs={'post_id': PostFormTest.post.pk}))
-
+        self.assertRedirects(response,
+                             reverse('posts:post_detail',
+                                     kwargs={'post_id': PostFormTest.post.pk}))
