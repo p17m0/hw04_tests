@@ -39,13 +39,16 @@ class PagesTests(TestCase):
                 'posts/group_list.html',
             (reverse('posts:profile', kwargs={'username': 'HasNoName'})):
                 'posts/profile.html',
-            (reverse('posts:post_detail', kwargs={'post_id': PagesTests.post.pk})):
+            (reverse('posts:post_detail',
+                     kwargs={'post_id': PagesTests.post.pk})):
                 'posts/post_detail.html',
             reverse('posts:post_create'): 'posts/create_post.html',
-            (reverse('posts:post_edit', kwargs={'post_id': PagesTests.post.pk})):
+            (reverse('posts:post_edit',
+                     kwargs={'post_id': PagesTests.post.pk})):
                 'posts/create_post.html',
         }
-        # Проверяем, что при обращении к name вызывается соответствующий HTML-шаблон
+        # Проверяем, что при обращении
+        # к name вызывается соответствующий HTML-шаблон
         for reverse_name, template in templates_pages_names.items():
             with self.subTest(reverse_name=reverse_name):
                 response = self.authorized_client.get(reverse_name)
@@ -61,7 +64,8 @@ class PagesTests(TestCase):
             'text': forms.fields.CharField,
         }
 
-        # Проверяем, что типы полей формы в словаре context соответствуют ожиданиям
+        # Проверяем, что типы полей
+        # формы в словаре context соответствуют ожиданиям
         for value, expected in form_fields.items():
             with self.subTest(value=value):
                 form_field = response.context.get('form').fields.get(value)

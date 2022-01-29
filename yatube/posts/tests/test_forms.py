@@ -40,7 +40,8 @@ class PostFormTest(TestCase):
             follow=True
         )
         self.assertRedirects(response,
-                             reverse('posts:profile', kwargs={'username': 'HasNoName'}))
+                             reverse('posts:profile',
+                                     kwargs={'username': 'HasNoName'}))
 
     def test_PostForm_edit(self):
         """Тестируем PostForm."""
