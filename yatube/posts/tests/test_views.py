@@ -84,7 +84,8 @@ class PagesTests(TestCase):
             'text': forms.fields.CharField,
         }
 
-        # Проверяем, что типы полей формы в словаре context соответствуют ожиданиям
+        # Проверяем, что типы полей
+        # формы в словаре context соответствуют ожиданиям
         for value, expected in form_fields.items():
             with self.subTest(value=value):
                 form_field = response.context.get('form').fields.get(value)
