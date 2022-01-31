@@ -19,14 +19,15 @@ class PagesTests(TestCase):
         cls.user = User.objects.create_user(username='HasNoName')
         cls.authorized_client = Client()
         cls.authorized_client.force_login(cls.user)
-        Group.objects.create(
+        cls.group = Group.objects.create(
             title='Тестовый заголовок',
             description='Тестовый текст',
-            slug='test-slug'
+            slug=3
         )
         cls.post = Post.objects.create(
             author=cls.user,
             text='Тестовая группа',
+            group=cls.group
         )
 
     # Проверяем используемые шаблоны
@@ -35,9 +36,9 @@ class PagesTests(TestCase):
         # Собираем в словарь пары "имя_html_шаблона: reverse(name)"
         templates_pages_names = {
             reverse('posts:index'): 'posts/index.html',
-            (reverse('posts:posts_group', kwargs={'slug': 'test-slug'})):
+            (reverse('posts:posts_group', kwargs={'slug': self.group.slug})):
                 'posts/group_list.html',
-            (reverse('posts:profile', kwargs={'username': 'HasNoName'})):
+            (reverse('posts:profile', kwargs={'username': self.user.username})):
                 'posts/profile.html',
             (reverse('posts:post_detail',
                      kwargs={'post_id': PagesTests.post.pk})):
@@ -98,7 +99,7 @@ class PagesTests(TestCase):
     def test_posts_group_show_correct_context(self):
         """Шаблон task_list сформирован с правильным контекстом."""
         response = self.authorized_client.get(
-            reverse('posts:posts_group', kwargs={'slug': 'test-slug'}))
+            reverse('posts:posts_group', kwargs={'slug': self.group.slug}))
         # Взяли первый элемент из списка и проверили, что его содержание
         # совпадает с ожидаемым
         objecta = response.context.get('group')
@@ -106,11 +107,11 @@ class PagesTests(TestCase):
         title_0 = objecta.title
         description_0 = objecta.description
         slug_0 = objecta.slug
-        self.assertEqual(title_0, 'Тестовый заголовок')
-        self.assertEqual(description_0, 'Тестовый текст')
-        self.assertEqual(slug_0, 'test-slug')
+        self.assertEqual(title_0, self.group.title)
+        self.assertEqual(description_0, self.group.description)
+        self.assertEqual(slug_0, str(self.group.slug))
         self.assertIsInstance(page_obj, Page)
-        self.assertEqual(len(page_obj), 0)
+        self.assertEqual(len(page_obj), 1)
 
     # Проверяем, что словарь context страницы task/test-slug
     # содержит ожидаемые значения
@@ -119,13 +120,13 @@ class PagesTests(TestCase):
         response = (self.authorized_client.get(
             reverse('posts:post_detail',
                     kwargs={'post_id': PagesTests.post.pk})))
-        self.assertEqual(response.context.get('post').text, 'Тестовая группа')
+        self.assertEqual(response.context.get('post').text, self.post.text)
 
     def test_profile(self):
         """Шаблон profile проверка контекста."""
         response = (self.authorized_client.get(
             reverse('posts:profile',
-                    kwargs={'username': 'HasNoName'})))
+                    kwargs={'username': self.user.username})))
         page_obj = response.context.get('page_obj')
         self.assertIsInstance(page_obj, Page)
         self.assertEqual(len(page_obj), 1)
