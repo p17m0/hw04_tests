@@ -4,7 +4,6 @@ from django.test import TestCase, Client
 from django.urls import reverse
 
 from ..models import Group, Post
-from ..forms import PostForm
 
 User = get_user_model()
 
