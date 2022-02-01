@@ -38,12 +38,11 @@ class PostFormTest(TestCase):
         )
         self.assertRedirects(response,
                              reverse('posts:profile',
-                                     kwargs={'username': 'HasNoName'}))
-        first_post = Post.objects.last()
+                                     kwargs={'username': self.user.username}))
         posts_count = Post.objects.count()
         self.assertEqual(Post.objects.count(), posts_count)
+        first_post = Post.objects.first()
         self.assertEqual(first_post.text, PostFormTest.post.text)
-        self.assertEqual(first_post.group, PostFormTest.post.group)
 
     def test_PostForm_edit(self):
         """Тестируем PostForm."""
@@ -63,6 +62,9 @@ class PostFormTest(TestCase):
         self.assertRedirects(response,
                              reverse('posts:post_detail',
                                      kwargs={'post_id': self.post.pk}))
+        first_post = Post.objects.first()
+        self.assertEqual(first_post.text, form_data['text'])
+
 
     def test_PostForm_edit_guest(self):
         """Тестируем PostForm."""

@@ -140,3 +140,35 @@ class PagesTests(TestCase):
         self.assertIsInstance(page_obj, Page)
         self.assertEqual(len(page_obj), 1)
         self.assertIsInstance(page_obj[0], Post)
+
+
+class PaginationTest(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super(PaginationTest, cls).setUpClass()
+        cls.user = User.objects.create_user(username='HasNoName')
+        cls.authorized_client = Client()
+        cls.authorized_client.force_login(cls.user)
+        cls.group = Group.objects.create(
+            title='Тестовый заголовок',
+            description='Тестовый текст',
+            slug=3
+        )
+        for i in range(15):
+            cls.post = Post.objects.create(
+                author=cls.user,
+                text=f'{i}',
+                group=cls.group
+            )
+
+    def test_pagina(self):
+        """Проверка view index pagina."""
+        response = self.client.get(reverse('posts:index'))
+        page_obj = response.context.get('page_obj')
+        self.assertEqual(len(page_obj), 10)
+
+    def test_second_page_contains_three_records(self):
+        # Проверка: на второй странице должно быть три поста.
+        response = self.client.get(reverse('posts:index') + '?page=2')
+        self.assertEqual(len(response.context.get('page_obj')), 5)
+
