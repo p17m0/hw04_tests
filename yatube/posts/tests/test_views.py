@@ -171,4 +171,4 @@ class PaginationTest(TestCase):
         # Проверка: на второй странице должно быть три поста.
         response = self.client.get(reverse('posts:index') + '?page=2')
         self.assertEqual(len(response.context.get('page_obj')), 5)
-
+        
