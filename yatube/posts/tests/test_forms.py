@@ -65,7 +65,6 @@ class PostFormTest(TestCase):
         first_post = Post.objects.first()
         self.assertEqual(first_post.text, form_data['text'])
 
-
     def test_PostForm_edit_guest(self):
         """Тестируем PostForm."""
         form_data = {
