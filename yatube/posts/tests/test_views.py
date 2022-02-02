@@ -3,6 +3,7 @@ from django.test import Client, TestCase
 from django.urls import reverse
 from django import forms
 from django.core.paginator import Page
+from yatube.settings import QUANTITY
 
 from ..models import Post, Group
 
@@ -160,17 +161,19 @@ class PaginationTest(TestCase):
                 text=f'{i}',
                 group=cls.group
             )
+        cls.posts_count = Post.objects.count()
+        cls.second_quantity = cls.posts_count - QUANTITY
 
     def test_index_pagina(self):
         """Проверка view index pagina."""
         response = self.client.get(reverse('posts:index'))
         page_obj = response.context.get('page_obj')
-        self.assertEqual(len(page_obj), 10)
+        self.assertEqual(len(page_obj), QUANTITY)
 
     def test_index_second_page_contains_five_records(self):
         # Проверка: на второй странице должно быть три поста.
         response = self.client.get(reverse('posts:index') + '?page=2')
-        self.assertEqual(len(response.context.get('page_obj')), 5)
+        self.assertEqual(len(response.context.get('page_obj')), self.second_quantity)
 
     def test_profile(self):
         """Шаблон profile проверка контекста."""
@@ -178,14 +181,14 @@ class PaginationTest(TestCase):
             reverse('posts:profile',
                     kwargs={'username': self.user.username})))
         page_obj = response.context.get('page_obj')
-        self.assertEqual(len(page_obj), 10)
+        self.assertEqual(len(page_obj), QUANTITY)
 
     def test_profile_second_page_contains_five_records(self):
         # Проверка: на второй странице должно быть три поста.
         response = (self.authorized_client.get(
             reverse('posts:profile',
                     kwargs={'username': self.user.username}) + '?page=2'))
-        self.assertEqual(len(response.context.get('page_obj')), 5)
+        self.assertEqual(len(response.context.get('page_obj')), self.second_quantity)
 
     def test_group_list_paginator(self):
         response = self.authorized_client.get(
@@ -193,11 +196,11 @@ class PaginationTest(TestCase):
         # Взяли первый элемент из списка и проверили, что его содержание
         # совпадает с ожидаемым
         page_obj = response.context.get('page_obj')
-        self.assertEqual(len(page_obj), 10)
+        self.assertEqual(len(page_obj), QUANTITY)
 
     def test_group_list_paginator_second_page(self):
         response = self.authorized_client.get(
             reverse('posts:posts_group',
                     kwargs={'slug': self.group.slug}) + '?page=2')
         page_obj = response.context.get('page_obj')
-        self.assertEqual(len(page_obj), 5)
+        self.assertEqual(len(page_obj), self.second_quantity)
