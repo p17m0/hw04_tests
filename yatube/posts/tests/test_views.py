@@ -197,6 +197,7 @@ class PaginationTest(TestCase):
 
     def test_group_list_paginator_second_page(self):
         response = self.authorized_client.get(
-            reverse('posts:posts_group', kwargs={'slug': self.group.slug}) + '?page=2')
+            reverse('posts:posts_group',
+                    kwargs={'slug': self.group.slug}) + '?page=2')
         page_obj = response.context.get('page_obj')
         self.assertEqual(len(page_obj), 5)
