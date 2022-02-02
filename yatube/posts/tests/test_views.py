@@ -173,7 +173,8 @@ class PaginationTest(TestCase):
     def test_index_second_page_contains_five_records(self):
         # Проверка: на второй странице должно быть три поста.
         response = self.client.get(reverse('posts:index') + '?page=2')
-        self.assertEqual(len(response.context.get('page_obj')), self.second_quantity)
+        self.assertEqual(len(response.context.get('page_obj')),
+                         self.second_quantity)
 
     def test_profile(self):
         """Шаблон profile проверка контекста."""
@@ -188,7 +189,8 @@ class PaginationTest(TestCase):
         response = (self.authorized_client.get(
             reverse('posts:profile',
                     kwargs={'username': self.user.username}) + '?page=2'))
-        self.assertEqual(len(response.context.get('page_obj')), self.second_quantity)
+        self.assertEqual(len(response.context.get('page_obj')),
+                         self.second_quantity)
 
     def test_group_list_paginator(self):
         response = self.authorized_client.get(
